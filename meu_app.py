@@ -141,42 +141,60 @@ def renderizar_pagina_vendas(df):
         if fig_dias:
             st.plotly_chart(fig_dias)
 
-    def criar_grafico_top_produtos(df, top_n=10):
-        """Cria um gráfico dos top N produtos mais vendidos."""
-        df_top_produtos = produtos_mais_vendidos(df, top_n)
+    # def criar_grafico_top_produtos(df, top_n=10):
+    #     """Cria um gráfico dos top N produtos mais vendidos."""
+    #     df_top_produtos = produtos_mais_vendidos(df, top_n)
 
-        labels = {'Descricao_produto': 'Produto', 'Valor_Total_Item': 'Valor Total de Venda'}
-        fig = criar_grafico_barras(df_top_produtos, 'Descricao_produto', 'Valor_Total_Item', 
-                                f'Top {top_n} Produtos Mais Vendidos', labels)
+    #     labels = {'Descricao_produto': 'Produto', 'Valor_Total_Item': 'Valor Total de Venda'}
+    #     fig = criar_grafico_barras(df_top_produtos, 'Descricao_produto', 'Valor_Total_Item', 
+    #                             f'Top {top_n} Produtos Mais Vendidos', labels)
 
-        return fig
-
-    # Adicionar o gráfico na página
-    st.subheader("Top 10 Produtos Mais Vendidos")
-    fig_top_produtos = criar_grafico_top_produtos(df_filtrado)
-    st.plotly_chart(fig_top_produtos, key="top_produtos")
-
+    #     return fig
 
     # Adicionar o gráfico na página
-    st.subheader("Vendas por Mês")
+    
+    # fig_top_produtos = criar_grafico_top_produtos(df_filtrado)
+    # st.plotly_chart(fig_top_produtos, key="top_produtos")
+
+    def ranking_clientes(df, top_n=20):
+        """Retorna os top N clientes com maior faturamento total, incluindo o número do ranking."""
+        df_clientes = df.groupby('Cliente').agg({'Valor_Total_Item': 'sum'}).reset_index()
+        df_clientes = df_clientes.sort_values(by='Valor_Total_Item', ascending=False).head(top_n)
+        df_clientes['Ranking'] = range(1, len(df_clientes) + 1)  # Adiciona o número do ranking
+        df_clientes['Valor_Total_Item'] = df_clientes['Valor_Total_Item'].apply(formatar_moeda)  # Formatar valores
+        df_clientes = df_clientes[['Ranking', 'Cliente', 'Valor_Total_Item']]  # Organiza a ordem das colunas
+        return df_clientes
+
+    
+
+
+    # Adicionar o gráfico na página
     fig_meses = criar_grafico_meses(df_filtrado)
     st.plotly_chart(fig_meses)
 
     # Gráficos
-    st.subheader("Vendas por Linha de Produto")
     fig_linha = criar_grafico_barras(agrupar_e_somar(df_filtrado, 'Linha'), 'Linha', 'Valor_Total_Item',
                                     'Vendas por Linha de Produto', {'Valor_Total_Item': 'Valor Total de Venda'})
     st.plotly_chart(fig_linha)
 
-    st.subheader("Vendas por Vendedor")
     fig_vendedor = criar_grafico_barras(agrupar_e_somar(df_filtrado, 'Vendedor'), 'Vendedor', 'Valor_Total_Item',
                                         'Vendas por Vendedor', {'Valor_Total_Item': 'Valor Total de Venda'})
     st.plotly_chart(fig_vendedor)
 
-    st.subheader("Top 10 Produtos Mais Vendidos")
+    
     fig_produtos = criar_grafico_barras(produtos_mais_vendidos(df_filtrado), 'Descricao_produto', 'Valor_Total_Item',
                                         'Top 10 Produtos Mais Vendidos',
                                         {'Descricao_produto': 'Produto', 'Valor_Total_Item': 'Valor Total de Venda'})
     st.plotly_chart(fig_produtos)
+
+    # Exibir o ranking em formato de tabela
+    st.subheader("Top 20 Clientes por Faturamento Total")
+    df_ranking = ranking_clientes(df_filtrado)
+
+    # Resetar o índice do DataFrame para remover o índice padrão
+    df_ranking = df_ranking.reset_index(drop=True)
+
+    # Exibir a tabela no Streamlit
+    st.dataframe(df_ranking, use_container_width=True)
 
     
