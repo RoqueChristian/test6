@@ -84,7 +84,7 @@ def renderizar_pagina_vendas(df):
 
     df_filtrado = aplicar_filtros(df, vendedor_selecionado, mes_selecionado, ano_selecionado, situacao_selecionada)
 
-    # Métricas
+    
     total_nf, total_qtd_produto, valor_total_item, total_custo_compra, total_lucro_venda = calcular_metricas(df_filtrado)
     col1, col2, col3, col4, col5 = st.columns(5)
     col1.metric("Total de Notas", f"{total_nf}")
@@ -96,17 +96,17 @@ def renderizar_pagina_vendas(df):
     def criar_grafico_meses(df):
         """Cria um gráfico de vendas por mês com o mesmo layout padrão."""
         df_meses = df.groupby('Mes').agg({'Valor_Total_Item': 'sum'}).reset_index()
-        df_meses = df_meses.sort_values(by='Mes')  # Garante que os meses estejam ordenados corretamente
+        df_meses = df_meses.sort_values(by='Mes') 
 
         labels = {'Mes': 'Mês', 'Valor_Total_Item': 'Valor Total de Venda'}
         fig = criar_grafico_barras(df_meses, 'Mes', 'Valor_Total_Item', 'Vendas por Mês', labels)
 
-        # Ajuste adicional para garantir que os meses sejam mostrados corretamente
+        
         fig.update_layout(
             xaxis=dict(
                 tickmode='array',
                 tickvals=list(range(1, 13)),
-                ticktext=[str(i) for i in range(1, 13)]
+                ticktext=['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
             )
         )
 
