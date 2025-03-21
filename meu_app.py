@@ -48,7 +48,7 @@ def criar_grafico_barras(df, x, y, title, labels):
     df['Valor_Monetario'] = df[y].apply(formatar_moeda)
 
     fig = px.bar(df, x=x, y=y, title=title, labels=labels, 
-                 color=y, text_auto=True, template="plotly_white", 
+                 color=y, text=df['Valor_Monetario'], template="plotly_white", 
                  hover_data={x: False, y: False, 'Valor_Monetario': True})  
 
     fig.update_traces(marker=dict(line=dict(color='black', width=1)), 
@@ -159,7 +159,7 @@ def renderizar_pagina_vendas(df):
             labels = {'Mes': 'Mês', 'Valor_Total_Item': 'Valor Total de Venda'}
             
             fig = px.bar(df_meses, x='Mes', y='Valor_Total_Item', title='Vendas por Mês', 
-                        labels=labels, color='Valor_Total_Item', text_auto=True, 
+                        labels=labels, color='Valor_Total_Item', text=df_meses["Valor_Monetario"], 
                         template="plotly_white", hover_data={'Valor_Total_Item': False, 'Valor_Monetario': True})
 
             fig.update_traces(marker=dict(line=dict(color='black', width=1)),
@@ -529,10 +529,10 @@ def renderizar_pagina_vendedor(df):
                         title='Ticket Médio por Vendedor e Semana',
                         labels={'Ticket_Medio': 'Ticket Médio', 'Semana': 'Semana'},
                         color_continuous_scale=px.colors.sequential.Plasma,
-                        text_auto=True, 
+                        text='Ticket Medio',
                         hover_data={'Semana': False, 'Ticket_Medio': False, 'Ticket Medio': True})  
 
-            # Ajustes do gráfico
+           
             fig.update_traces(marker=dict(line=dict(color='black', width=1)),
                             hoverlabel=dict(bgcolor="black", font_size=22, font_family="Arial_bold, sans-serif"))
 
